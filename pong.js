@@ -5,6 +5,7 @@ var ctx = canvas.getContext("2d");
 ////General config vars
 var scoreP1 = 0;
 var scoreP2 = 0;
+var gamePaused = false;
 
 //Keys
 var upPressed = false;
@@ -44,6 +45,7 @@ function keyDownHandler(e) {
 	//Escape
 	if(e.keyCode == 27){
 		//pause game
+		gamePaused = !gamePaused;
 	}
 
 	//Up arrow
@@ -113,6 +115,15 @@ function drawScore(){
 	ctx.fillText(scoreP1 + " - " + scoreP2, canvas.width/2 - 14, 22);
 }
 
+function drawPauseMenu(){
+	if(gamePaused){
+		ctx.font = "32px Arial";
+		ctx.fillStyle = "black";
+		ctx.fillText("PAUSED", canvas.width/2 - 50, canvas.height/2);
+		ctx.fillText("Press Escape to resume.", canvas.width/2 - 150, canvas.height/2 + 40);
+	}
+}
+
 function reset(){
 	//Reset ball pos
 	x = canvas.width/2;
@@ -132,52 +143,59 @@ function reset(){
 }
 
 function update(){
-	////Collisions
+	if(!gamePaused){
 
-	//top and bottom ball collision
-	if(y + dy - ballRadius < 0 || y + dy + ballRadius > canvas.height)
-		dy = -dy;
+		////Collisions
 
-	//Side collision and scoring detection
-	//Left
-	if(x + dx - ballRadius < 0){
-		//checking if ball is in contact with paddle
-		if(y > paddleYP1 && y < paddleYP1 + paddleHeight)
-			dx = -dx;
-		else{
-			scoreP2++;
-			alert("P2 scored!");
+		//top and bottom ball collision
+		if(y + dy - ballRadius < 0 || y + dy + ballRadius > canvas.height)
+			dy = -dy;
 
-			reset();
+		//Side collision and scoring detection
+		//Left
+		if(x + dx - ballRadius < 0){
+			//checking if ball is in contact with paddle
+			if(y > paddleYP1 && y < paddleYP1 + paddleHeight)
+				dx = -dx;
+			else{
+				scoreP2++;
+				alert("P2 scored!");
+
+				reset();
+			}
 		}
-	}
 
-	//Right
-	if(x + dx + ballRadius > canvas.width){
-		//checking if ball is in contact with paddle
-		if(y > paddleYP2 && y < paddleYP2 + paddleHeight)
-			dx = -dx;
-		else{
-			scoreP1++;
-			alert("P1 scored!");
+		//Right
+		if(x + dx + ballRadius > canvas.width){
+			//checking if ball is in contact with paddle
+			if(y > paddleYP2 && y < paddleYP2 + paddleHeight)
+				dx = -dx;
+			else{
+				scoreP1++;
+				alert("P1 scored!");
 
-			reset();
+				reset();
+			}
 		}
+
+		////End of collisions
+
+		//Paddle Movement
+
+		if(downPressed && paddleYP2 + paddleHeight < canvas.height)
+			paddleYP2 += paddleDYP2;
+		else if(upPressed && paddleYP2 > 0)
+			paddleYP2 -= paddleDYP2;
+
+		if(wPressed && paddleYP1 > 0)
+			paddleYP1 -= paddleDYP1;
+		else if(sPressed && paddleYP1 + paddleHeight < canvas.height)
+			paddleYP1 += paddleDYP1;
+
+		//Ball movement
+		x += dx;
+		y += dy;
 	}
-
-	////End of collisions
-
-	//Movement
-
-	if(downPressed && paddleYP2 + paddleHeight < canvas.height)
-		paddleYP2 += paddleDYP2;
-	else if(upPressed && paddleYP2 > 0)
-		paddleYP2 -= paddleDYP2;
-
-	if(wPressed && paddleYP1 > 0)
-		paddleYP1 -= paddleDYP1;
-	else if(sPressed && paddleYP1 + paddleHeight < canvas.height)
-		paddleYP1 += paddleDYP1;
 }
 
 //draw stuff here
@@ -190,9 +208,8 @@ function draw(){
 	drawPaddleP1();
 	drawPaddleP2();
 	drawScore();
+	drawPauseMenu();
 	
-	x += dx;
-	y += dy;
 	requestAnimationFrame(draw);
 }
 

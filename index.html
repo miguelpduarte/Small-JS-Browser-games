@@ -12,8 +12,27 @@
 
 <canvas id="myCanvas" width="480" height="320"></canvas>
 
-<script type="text/javascript" src="pong.js">
-</script>
+<button type="button" value="Submit" onclick="pongBtnClick()" id='pongButton'>Click me for Pong!
+<div id="mylink"></div>
+</button>
 
+<script type="text/javascript">
+
+function pongBtnClick(){
+
+	var pongButton = document.getElementById('pongButton');
+
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src = "pong.js"; 
+    document.getElementsByTagName("head")[0].appendChild(script);
+    return false;
+
+}
+</script>
+<!--
+<script language="javascript" type="text/javascript" src="pong.js">
+</script>
+-->
 </body>
 </html>

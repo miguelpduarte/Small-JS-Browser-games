@@ -5,7 +5,8 @@ My attempt to learn some JS through creating some small 2d browser games.
 - Pong
 
 ### To do:
-- Implement pause and powerups in Pong
+- Tetris!
+- Implement powerups in Pong
 - ???
 
 ## Disclaimer:

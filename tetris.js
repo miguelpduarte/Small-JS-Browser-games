@@ -1,11 +1,11 @@
 //Game constants
 var GAMEHEIGHT = 800; // 32 * 25
-var GAMEWIDTH = 420;
-var GAMEMIDDLE = Math.floor(GAMEWIDTH / 2);
+var GAMEWIDTH = 425; // 17 * 25
+var GAMEMIDDLE = 0; // Hardcoded so that the blocks would correctly "snap" to the grid
 var BLOCKPADDINGPX = 25;
 var BLOCKHEIGHT = 25;
 var BLOCKWIDTH = 25;
-var UPDATETIME_SECS = 1;
+var DROPTIME_SECS = 1;
 
 //Getting the canvas context to draw on
 var canvas = document.getElementById("myCanvas");
@@ -17,6 +17,11 @@ var ctx = canvas.getContext("2d");
 ////General game config vars
 var score = 0;
 var gamePaused = false;
+//the height of the game grid, in blocks
+var gamegridHeight = 32;
+//the width of the game grid, in blocks
+var gamegridWidth = 17;
+////Block holding and config vars
 //Array that will store the pieces as they drop
 var TPieceArr = [];
 //Array that holds the several sets of positions that make the different shapes
@@ -31,10 +36,15 @@ var TPieceTypes = [
 	];
 
 ////Keys
-var upPressed = false;
+
+//var upPressed = false;
 var downPressed = false;
+//var leftPressed = false;
+//var rightPressed = false;
 var wPressed = false;
 var sPressed = false;
+
+var gamePaused = false;
 
 document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
@@ -48,11 +58,19 @@ function keyDownHandler(e) {
 
 	//Up arrow
     if(e.keyCode == 38) {
-    	upPressed = true;
+    	rotateTPiecesCW();
 	}
 	//Down arrow
 	else if(e.keyCode == 40) {
         downPressed = true;
+    }
+    //Left arrow
+    else if(e.keyCode == 37){
+    	shiftTPiecesLeft();
+    }
+    //Right arrow
+    else if(e.keyCode == 39){
+    	shiftTPiecesRight();
     }
     //W
     else if(e.keyCode == 87){
@@ -67,11 +85,19 @@ function keyDownHandler(e) {
 function keyUpHandler(e) {
 	//Up arrow
     if(e.keyCode == 38) {
-    	upPressed = false;
+    	//upPressed = false;
 	}
 	//Down arrow
 	else if(e.keyCode == 40) {
         downPressed = false;
+    }
+    //Left arrow
+    else if(e.KeyCode == 37){
+    	//leftPressed = false;
+    }
+    //Right arrow
+    else if(e.keyCode == 39){
+    	//rightPressed = false;
     }
     //W
     else if(e.keyCode == 87){
@@ -90,25 +116,32 @@ function Color(r, g, b){
 	this.b = b;
 }
 
+//relBlock is a block with relative positions, in relation to the block center
 function relBlock(relX, relY){
 	this.relX = relX;
 	this.relY = relY;
 }
 
+//absBlock is a block and its absolute positions and color (to ease moving to backdrop)
 function absBlock(absX, absY, color){
 	this.absX = absX;
 	this.absY = absY;
 	this.color = color;
 }
 
+//For use in the input for creating a TPiece
 function Position(x, y){
 	this.x = x;
 	this.y = y;
 }
 
-//relpositions is the array of position objects, relative to the center, for each piece
-//Note to future self: for ease of rendering, the center is always the topmost (1st) leftmost (2nd criteria) block
-//Thus: only positive Xs and Ys, which in the canvas context mean to the right and downwards
+//Properties:
+//color : piece color
+//blocks : array of relBlocks
+//centerX : center X position (abs)
+//centerY : center Y position (abs)
+//rotateCW() : rotates piece clockwise
+//rotateCCW() : rotates piece counterclockwise
 function TPiece(color, relpositions){
 	this.color = color;
 	this.blocks = [];
@@ -121,14 +154,39 @@ function TPiece(color, relpositions){
 	this.centerY = 0;
 
 	this.rotateCW = function(){
-		//Do stuff to rotate all blocks clockwise
+
+		//rotating CW is x = -y and y = x
+
+		for(var i = 0; i < this.blocks.length; i++){
+			var oldX = TPieceArr[0].blocks[i].relX;
+			this.blocks[i].relX = -this.blocks[i].relY;
+			this.blocks[i].relY = oldX;
+		}
 	};
 
 	this.rotateCCW = function(){
-		//Do stuff to rotate all blocks counterclockwise
+		
+		//Simillarly, rotatin CCW is x = y and y = -x
+
+		for(var i = 0; i < this.blocks.length; i++){
+			var oldX = TPieceArr[0].blocks[i].relX;
+			this.blocks[i].relX = this.blocks[i].relY;
+			this.blocks[i].relY = -oldX;
+		}
 	};
 }
 
+
+//todo: write comment
+function TPiecetoabsBlocks(tpiece){
+	var absBlocks = [];
+
+	for(var i = 0; i < tpiece.blocks.length; i++){
+		absBlocks.push(new absBlock(tpiece.centerX + tpiece.blocks[i].relX * BLOCKPADDINGPX, tpiece.centerY + tpiece.blocks[i].relY * BLOCKPADDINGPX, tpiece.color));
+	}
+
+	return absBlocks;
+}
 
 function drawTPiece(tpiece){
 	var blocks = TPiecetoabsBlocks(tpiece);
@@ -142,33 +200,86 @@ function drawTPiece(tpiece){
 	}
 }
 
-function descendTPiece(tpiece){
-	tpiece.centerY += BLOCKHEIGHT;
-}
-
-//todo: write comment
-function TPiecetoabsBlocks(tpiece){
-	var absBlocks = [];
-
-	for(var i = 0; i < tpiece.blocks.length; i++){
-		absBlocks.push(new absBlock(tpiece.centerX + tpiece.blocks[i].relX * BLOCKPADDINGPX, tpiece.centerY + tpiece.blocks[i].relY * BLOCKPADDINGPX, tpiece.color));
+function checkIfTPieceDoesntHitBottom(absBlocks){
+	for(var i = 0; i < absBlocks.length; i++){
+		if(absBlocks[i].absY + BLOCKHEIGHT >= GAMEHEIGHT)
+			return false;
 	}
 
-	return absBlocks;
+	return true;
 }
 
-//Generating a random colored square piece - DEBUG
-TPieceArr.push(new TPiece(new Color(Math.floor(Math.random() * 256), Math.floor(Math.random() * 256), Math.floor(Math.random() * 256)), TPieceTypes[Math.floor(Math.random() * TPieceTypes.length)]));
-
-function update(){
+function dropTPieces(){
 	for(var i = 0; i < TPieceArr.length; i++){
-		if(TPieceArr[i].centerY + BLOCKHEIGHT < GAMEHEIGHT)
-			descendTPiece(TPieceArr[i]);
-		else{
+
+		var blocks = TPiecetoabsBlocks(TPieceArr[i]);
+
+		if(checkIfTPieceDoesntHitBottom(blocks)){
+			//If the piece doesn't hit the bottom, then lower it
+			TPieceArr[i].centerY += BLOCKHEIGHT;
+		} else{
 			//Put the blocks into the "background"
 		}
+		
 	}
 }
+
+function rotateTPiecesCW(){
+	for(var i = 0; i < TPieceArr.length; i++){
+		TPieceArr[i].rotateCW();
+	}
+}
+
+function rotateTPiecesCCW(){
+	for(var i = 0; i < TPieceArr.length; i++){
+		TPieceArr[i].rotateCCW();
+	}
+}
+
+function checkIfTPieceDoesntHitRight(absBlocks){
+	for(var i = 0; i < absBlocks.length; i++){
+		if(absBlocks[i].absX + BLOCKWIDTH >= GAMEWIDTH)
+			return false;
+	}
+
+	return true;
+}
+
+function shiftTPiecesRight(){
+	for(var i = 0; i < TPieceArr.length; i++){
+
+		var blocks = TPiecetoabsBlocks(TPieceArr[i]);
+
+		if(checkIfTPieceDoesntHitRight(blocks)){
+			//If the piece doesn't hit the right, then shift it
+			TPieceArr[i].centerX += BLOCKWIDTH;
+		}		
+	}
+}
+
+function checkIfTPieceDoesntHitLeft(absBlocks){
+	for(var i = 0; i < absBlocks.length; i++){
+		if(absBlocks[i].absX - BLOCKWIDTH < 0)
+			return false;
+	}
+
+	return true;
+}
+
+function shiftTPiecesLeft(){
+	for(var i = 0; i < TPieceArr.length; i++){
+
+		var blocks = TPiecetoabsBlocks(TPieceArr[i]);
+
+		if(checkIfTPieceDoesntHitLeft(blocks)){
+			//If the piece doesn't hit the left, then shift it
+			TPieceArr[i].centerX -= BLOCKWIDTH;
+		}		
+	}
+}
+
+//Generating a random colored square piece - DEBUG 
+TPieceArr.push(new TPiece(new Color(Math.floor(Math.random() * 256), Math.floor(Math.random() * 256), Math.floor(Math.random() * 256)), TPieceTypes[Math.floor(Math.random() * TPieceTypes.length)]));
 
 //draw stuff here
 function draw(){
@@ -178,10 +289,12 @@ function draw(){
 		drawTPiece(TPieceArr[i]);
 	}
 
+	//drawPause();
+
 	requestAnimationFrame(draw);
 }
 
-setInterval(update, 1000 * UPDATETIME_SECS);
+setInterval(dropTPieces, 1000 * DROPTIME_SECS);
 
 draw();
 

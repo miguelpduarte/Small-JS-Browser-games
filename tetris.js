@@ -90,10 +90,15 @@ function Color(r, g, b){
 	this.b = b;
 }
 
-function Block(color, relX, relY){
-	this.color = color;
+function relBlock(relX, relY){
 	this.relX = relX;
 	this.relY = relY;
+}
+
+function absBlock(absX, absY, color){
+	this.absX = absX;
+	this.absY = absY;
+	this.color = color;
 }
 
 function Position(x, y){
@@ -104,12 +109,12 @@ function Position(x, y){
 //relpositions is the array of position objects, relative to the center, for each piece
 //Note to future self: for ease of rendering, the center is always the topmost (1st) leftmost (2nd criteria) block
 //Thus: only positive Xs and Ys, which in the canvas context mean to the right and downwards
-function TPiece(Color, relpositions){
-	this.color = Color;
+function TPiece(color, relpositions){
+	this.color = color;
 	this.blocks = [];
 
 	for(var i = 0; i < relpositions.length; i++){
-		this.blocks.push(new Block(this.color, relpositions[i].x, relpositions[i].y));
+		this.blocks.push(new relBlock(relpositions[i].x, relpositions[i].y));
 	}
 
 	this.centerX = GAMEMIDDLE;
@@ -126,10 +131,12 @@ function TPiece(Color, relpositions){
 
 
 function drawTPiece(tpiece){
-	for(var i = 0; i < tpiece.blocks.length; i++){
+	var blocks = TPiecetoabsBlocks(tpiece);
+
+	for(var i = 0; i < blocks.length; i++){
 		ctx.beginPath();
-		ctx.rect(tpiece.centerX + tpiece.blocks[i].relX * BLOCKPADDINGPX, tpiece.centerY + tpiece.blocks[i].relY * BLOCKPADDINGPX, BLOCKWIDTH, BLOCKHEIGHT);
-		ctx.fillStyle = "rgba(" + tpiece.blocks[i].color.r + ", " + tpiece.blocks[i].color.g + ", " + tpiece.blocks[i].color.b +", "+"1.0)";
+		ctx.rect(blocks[i].absX, blocks[i].absY, BLOCKWIDTH, BLOCKHEIGHT);
+		ctx.fillStyle = "rgba(" + blocks[i].color.r + ", " + blocks[i].color.g + ", " + blocks[i].color.b +", "+"1.0)";
 		ctx.fill();
 		ctx.closePath();
 	}
@@ -137,6 +144,17 @@ function drawTPiece(tpiece){
 
 function descendTPiece(tpiece){
 	tpiece.centerY += BLOCKHEIGHT;
+}
+
+//todo: write comment
+function TPiecetoabsBlocks(tpiece){
+	var absBlocks = [];
+
+	for(var i = 0; i < tpiece.blocks.length; i++){
+		absBlocks.push(new absBlock(tpiece.centerX + tpiece.blocks[i].relX * BLOCKPADDINGPX, tpiece.centerY + tpiece.blocks[i].relY * BLOCKPADDINGPX, tpiece.color));
+	}
+
+	return absBlocks;
 }
 
 //Generating a random colored square piece - DEBUG

@@ -1,7 +1,7 @@
 //Game constants
 var GAMEHEIGHT = 800; // 32 * 25
 var GAMEWIDTH = 425; // 17 * 25
-var GAMEMIDDLE = 0; // Hardcoded so that the blocks would correctly "snap" to the grid
+var GAMEMIDDLE = 200; // Hardcoded so that the blocks would correctly "snap" to the grid (8 or 9 * 25)
 var BLOCKPADDINGPX = 25;
 var BLOCKHEIGHT = 25;
 var BLOCKWIDTH = 25;

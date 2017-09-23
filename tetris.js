@@ -165,7 +165,7 @@ function TPiece(color, relpositions){
 	};
 
 	this.rotateCCW = function(){
-		
+
 		//Simillarly, rotatin CCW is x = y and y = -x
 
 		for(var i = 0; i < this.blocks.length; i++){
@@ -220,7 +220,7 @@ function dropTPieces(){
 		} else{
 			//Put the blocks into the "background"
 		}
-		
+
 	}
 }
 
@@ -253,7 +253,7 @@ function shiftTPiecesRight(){
 		if(checkIfTPieceDoesntHitRight(blocks)){
 			//If the piece doesn't hit the right, then shift it
 			TPieceArr[i].centerX += BLOCKWIDTH;
-		}		
+		}
 	}
 }
 
@@ -274,12 +274,9 @@ function shiftTPiecesLeft(){
 		if(checkIfTPieceDoesntHitLeft(blocks)){
 			//If the piece doesn't hit the left, then shift it
 			TPieceArr[i].centerX -= BLOCKWIDTH;
-		}		
+		}
 	}
 }
-
-//Generating a random colored square piece - DEBUG 
-TPieceArr.push(new TPiece(new Color(Math.floor(Math.random() * 256), Math.floor(Math.random() * 256), Math.floor(Math.random() * 256)), TPieceTypes[Math.floor(Math.random() * TPieceTypes.length)]));
 
 //draw stuff here
 function draw(){
@@ -293,6 +290,14 @@ function draw(){
 
 	requestAnimationFrame(draw);
 }
+
+//Generates a random TPiece at the middle top of the game screen
+function generateRandomTPiece(){
+	TPieceArr.push(new TPiece(new Color(Math.floor(Math.random() * 256), Math.floor(Math.random() * 256), Math.floor(Math.random() * 256)), TPieceTypes[Math.floor(Math.random() * TPieceTypes.length)]));
+}
+
+//Getting the first piece to start the game
+generateRandomTPiece();
 
 setInterval(dropTPieces, 1000 * DROPTIME_SECS);
 

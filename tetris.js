@@ -1,10 +1,12 @@
 //Game constants
-var GAMEHEIGHT = 800; // 32 * 25
-var GAMEWIDTH = 425; // 17 * 25
-var GAMEMIDDLE = 200; // Hardcoded so that the blocks would correctly "snap" to the grid (8 or 9 * 25)
-var BLOCKPADDINGPX = 25;
-var BLOCKHEIGHT = 25;
-var BLOCKWIDTH = 25;
+var BLOCKPADDINGPX = 18;
+var BLOCKHEIGHT = 18;
+var BLOCKWIDTH = 18;
+var GAMEHEIGHTBLOCKS = 30;
+var GAMEHEIGHT = GAMEHEIGHTBLOCKS * BLOCKHEIGHT;
+var GAMEWIDTHBLOCKS = 15;
+var GAMEWIDTH = GAMEWIDTHBLOCKS * BLOCKWIDTH;
+var GAMEMIDDLE = Math.floor(GAMEWIDTHBLOCKS/2) * BLOCKWIDTH;
 var DROPTIME_SECS = 1;
 
 //Getting the canvas context to draw on

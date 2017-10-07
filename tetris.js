@@ -1,4 +1,11 @@
-//Game constants
+/*
+ ██████   █████  ███    ███ ███████      ██████  ██████  ███    ██ ███████ ████████  █████  ███    ██ ████████ ███████
+██       ██   ██ ████  ████ ██          ██      ██    ██ ████   ██ ██         ██    ██   ██ ████   ██    ██    ██
+██   ███ ███████ ██ ████ ██ █████       ██      ██    ██ ██ ██  ██ ███████    ██    ███████ ██ ██  ██    ██    ███████
+██    ██ ██   ██ ██  ██  ██ ██          ██      ██    ██ ██  ██ ██      ██    ██    ██   ██ ██  ██ ██    ██         ██
+ ██████  ██   ██ ██      ██ ███████      ██████  ██████  ██   ████ ███████    ██    ██   ██ ██   ████    ██    ███████
+*/
+
 var BLOCKPADDINGPX = 18;
 var BLOCKHEIGHT = 18;
 var BLOCKWIDTH = 18;
@@ -9,6 +16,15 @@ var GAMEWIDTH = GAMEWIDTHBLOCKS * BLOCKWIDTH;
 var GAMEMIDDLE = Math.floor(GAMEWIDTHBLOCKS / 2) * BLOCKWIDTH;
 var DROPTIME_SECS = 1;
 
+
+/*
+ ██████  █████  ███    ██ ██    ██  █████  ███████
+██      ██   ██ ████   ██ ██    ██ ██   ██ ██
+██      ███████ ██ ██  ██ ██    ██ ███████ ███████
+██      ██   ██ ██  ██ ██  ██  ██  ██   ██      ██
+ ██████ ██   ██ ██   ████   ████   ██   ██ ███████
+*/
+
 //Getting the canvas context to draw on
 var canvas = document.getElementById("myCanvas");
 //Chaning canvas size to match game requirements
@@ -16,7 +32,14 @@ canvas.height = GAMEHEIGHT;
 canvas.width = GAMEWIDTH;
 var ctx = canvas.getContext("2d");
 
-////General game config vars
+/*
+ ██████   █████  ███    ███ ███████      ██████  ██████  ███    ██ ███████ ██  ██████      ██    ██  █████  ██████  ███████
+██       ██   ██ ████  ████ ██          ██      ██    ██ ████   ██ ██      ██ ██           ██    ██ ██   ██ ██   ██ ██
+██   ███ ███████ ██ ████ ██ █████       ██      ██    ██ ██ ██  ██ █████   ██ ██   ███     ██    ██ ███████ ██████  ███████
+██    ██ ██   ██ ██  ██  ██ ██          ██      ██    ██ ██  ██ ██ ██      ██ ██    ██      ██  ██  ██   ██ ██   ██      ██
+ ██████  ██   ██ ██      ██ ███████      ██████  ██████  ██   ████ ██      ██  ██████        ████   ██   ██ ██   ██ ███████
+*/
+
 var score = 0;
 var gamePaused = false;
 //the height of the game grid, in blocks
@@ -39,6 +62,7 @@ var TPieceTypes = [
 //Map that holds the blocks after they have fallen
 var blockMap = new Map();
 
+//IDEA: Move to inside init ?
 //Generating an empty blockMap to eventually hold the dropped absBlock
 for (var i = 0; i < GAMEWIDTHBLOCKS; i++) {
   blockMap.set(i, new Map());
@@ -48,7 +72,13 @@ for (var i = 0; i < GAMEWIDTHBLOCKS; i++) {
   }
 }
 
-////Keys
+/*
+██   ██ ███████ ██    ██     ██ ███    ██ ██████  ██    ██ ████████     ██   ██  █████  ███    ██ ██████  ██      ██ ███    ██  ██████
+██  ██  ██       ██  ██      ██ ████   ██ ██   ██ ██    ██    ██        ██   ██ ██   ██ ████   ██ ██   ██ ██      ██ ████   ██ ██
+█████   █████     ████       ██ ██ ██  ██ ██████  ██    ██    ██        ███████ ███████ ██ ██  ██ ██   ██ ██      ██ ██ ██  ██ ██   ███
+██  ██  ██         ██        ██ ██  ██ ██ ██      ██    ██    ██        ██   ██ ██   ██ ██  ██ ██ ██   ██ ██      ██ ██  ██ ██ ██    ██
+██   ██ ███████    ██        ██ ██   ████ ██       ██████     ██        ██   ██ ██   ██ ██   ████ ██████  ███████ ██ ██   ████  ██████
+*/
 
 //var upPressed = false;
 var downPressed = false;
@@ -122,6 +152,14 @@ function keyUpHandler(e) {
   }
 }
 
+/*
+ ██████  ██████       ██ ███████  ██████ ████████ ███████
+██    ██ ██   ██      ██ ██      ██         ██    ██
+██    ██ ██████       ██ █████   ██         ██    ███████
+██    ██ ██   ██ ██   ██ ██      ██         ██         ██
+ ██████  ██████   █████  ███████  ██████    ██    ███████
+*/
+
 //Color is an object with the 3 color components for the piece (r,g,b)
 function Color(r, g, b) {
   this.r = r;
@@ -190,8 +228,14 @@ function TPiece(color, relpositions) {
   };
 }
 
+/*
+██   ██ ███████ ██      ██████  ███████ ██████      ███████ ██    ██ ███    ██  ██████ ████████ ██  ██████  ███    ██ ███████
+██   ██ ██      ██      ██   ██ ██      ██   ██     ██      ██    ██ ████   ██ ██         ██    ██ ██    ██ ████   ██ ██
+███████ █████   ██      ██████  █████   ██████      █████   ██    ██ ██ ██  ██ ██         ██    ██ ██    ██ ██ ██  ██ ███████
+██   ██ ██      ██      ██      ██      ██   ██     ██      ██    ██ ██  ██ ██ ██         ██    ██ ██    ██ ██  ██ ██      ██
+██   ██ ███████ ███████ ██      ███████ ██   ██     ██       ██████  ██   ████  ██████    ██    ██  ██████  ██   ████ ███████
+*/
 
-//TODO: write comment
 function TPiecetoabsBlocks(tpiece) {
   var absBlocks = [];
 
@@ -202,31 +246,31 @@ function TPiecetoabsBlocks(tpiece) {
   return absBlocks;
 }
 
-function drawAbsBlock(block){
-	ctx.beginPath();
-	ctx.rect(block.absX, block.absY, BLOCKWIDTH, BLOCKHEIGHT);
-	ctx.fillStyle = "rgba(" + block.color.r + ", " + block.color.g + ", " + block.color.b + ", " + "1.0)";
-	ctx.fill();
-	ctx.closePath();
-}
+function absBlockstoBackground(blocks) {
 
-function drawTPiece(tpiece) {
-  var blocks = TPiecetoabsBlocks(tpiece);
+	var blockXinBlocks;
+	var blockYinBlocks;
 
   for (var i = 0; i < blocks.length; i++) {
-		drawAbsBlock(blocks[i]);
+		blockXinBlocks = blocks[i].absX / BLOCKWIDTH;
+		blockYinBlocks = blocks[i].absY / BLOCKHEIGHT;
+		blockMap.get(blockXinBlocks).set(blockYinBlocks, blocks[i]);
   }
+
 }
 
-function drawBackground() {
-  for (var i = 0; i < GAMEWIDTHBLOCKS; i++) {
-    for (var j = 0; j < GAMEHEIGHTBLOCKS; j++) {
-			if(blockMap.get(i).get(j) != 0){
-				drawAbsBlock(blockMap.get(i).get(j));
-			}
-    }
-  }
+//Generates a random TPiece at the middle top of the game screen
+function generateRandomTPiece() {
+  TPieceArr.push(new TPiece(new Color(Math.floor(Math.random() * 256), Math.floor(Math.random() * 256), Math.floor(Math.random() * 256)), TPieceTypes[Math.floor(Math.random() * TPieceTypes.length)]));
 }
+
+/*
+ ██████  ██████  ██      ██      ██ ███████ ██  ██████  ███    ██      █████  ███    ██ ██████      ███    ███  ██████  ██    ██ ███████ ███    ███ ███████ ███    ██ ████████
+██      ██    ██ ██      ██      ██ ██      ██ ██    ██ ████   ██     ██   ██ ████   ██ ██   ██     ████  ████ ██    ██ ██    ██ ██      ████  ████ ██      ████   ██    ██
+██      ██    ██ ██      ██      ██ ███████ ██ ██    ██ ██ ██  ██     ███████ ██ ██  ██ ██   ██     ██ ████ ██ ██    ██ ██    ██ █████   ██ ████ ██ █████   ██ ██  ██    ██
+██      ██    ██ ██      ██      ██      ██ ██ ██    ██ ██  ██ ██     ██   ██ ██  ██ ██ ██   ██     ██  ██  ██ ██    ██  ██  ██  ██      ██  ██  ██ ██      ██  ██ ██    ██
+ ██████  ██████  ███████ ███████ ██ ███████ ██  ██████  ██   ████     ██   ██ ██   ████ ██████      ██      ██  ██████    ████   ███████ ██      ██ ███████ ██   ████    ██
+*/
 
 function checkIfTPieceDoesntHitBottom(absBlocks) {
   for (var i = 0; i < absBlocks.length; i++) {
@@ -242,10 +286,11 @@ function dropTPieces() {
 
     var blocks = TPiecetoabsBlocks(TPieceArr[i]);
 
-    if (checkIfTPieceDoesntHitBottom(blocks)) {
+    if (checkIfTPieceDoesntHitBottom(blocks)/* && checkIfTPieceDoesntHitBlocks(blocks)*/) {
       //If the piece doesn't hit the bottom, then lower it
       TPieceArr[i].centerY += BLOCKHEIGHT;
     } else {
+			//TPiece has hit blocks or bottom, so:
       //Put the blocks into the "background"
       absBlockstoBackground(blocks);
 			//Remove TPiece from array
@@ -255,19 +300,6 @@ function dropTPieces() {
     }
 
   }
-}
-
-function absBlockstoBackground(blocks) {
-
-	var blockXinBlocks;
-	var blockYinBlocks;
-
-  for (var i = 0; i < blocks.length; i++) {
-		blockXinBlocks = blocks[i].absX / BLOCKWIDTH;
-		blockYinBlocks = blocks[i].absY / BLOCKHEIGHT;
-		blockMap.get(blockXinBlocks).set(blockYinBlocks, blocks[i]);
-  }
-
 }
 
 function rotateTPiecesCW() {
@@ -324,32 +356,81 @@ function shiftTPiecesLeft() {
   }
 }
 
+/*
+██████  ██████   █████  ██     ██ ██ ███    ██  ██████
+██   ██ ██   ██ ██   ██ ██     ██ ██ ████   ██ ██
+██   ██ ██████  ███████ ██  █  ██ ██ ██ ██  ██ ██   ███
+██   ██ ██   ██ ██   ██ ██ ███ ██ ██ ██  ██ ██ ██    ██
+██████  ██   ██ ██   ██  ███ ███  ██ ██   ████  ██████
+*/
+
+function drawAbsBlock(block){
+	ctx.beginPath();
+	ctx.rect(block.absX, block.absY, BLOCKWIDTH, BLOCKHEIGHT);
+	ctx.fillStyle = "rgba(" + block.color.r + ", " + block.color.g + ", " + block.color.b + ", " + "1.0)";
+	ctx.fill();
+	ctx.closePath();
+}
+
+function drawTPiece(tpiece) {
+  var blocks = TPiecetoabsBlocks(tpiece);
+
+  for (var i = 0; i < blocks.length; i++) {
+		drawAbsBlock(blocks[i]);
+  }
+}
+
+function drawBackground() {
+  for (var i = 0; i < GAMEWIDTHBLOCKS; i++) {
+    for (var j = 0; j < GAMEHEIGHTBLOCKS; j++) {
+			if(blockMap.get(i).get(j) != 0){
+				drawAbsBlock(blockMap.get(i).get(j));
+			}
+    }
+  }
+}
+
 //draw stuff here
 function draw() {
+	//Clearing the screen
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+	//Drawing the piece that is currently dropping
   for (var i = 0; i < TPieceArr.length; i++) {
     drawTPiece(TPieceArr[i]);
   }
 
-  //drawPause();
-	//dropped pieces
+  //drawPause(); //TODO
+
+	//drawing the dropped pieces
   drawBackground();
 
+	//Makes it so that the draw function is called whenever necessary - makes it so that there is no need to rely on a setInterval function
   requestAnimationFrame(draw);
 }
 
-//Generates a random TPiece at the middle top of the game screen
-function generateRandomTPiece() {
-  TPieceArr.push(new TPiece(new Color(Math.floor(Math.random() * 256), Math.floor(Math.random() * 256), Math.floor(Math.random() * 256)), TPieceTypes[Math.floor(Math.random() * TPieceTypes.length)]));
+/*
+ ██████  ████████ ██   ██ ███████ ██████
+██    ██    ██    ██   ██ ██      ██   ██
+██    ██    ██    ███████ █████   ██████
+██    ██    ██    ██   ██ ██      ██   ██
+ ██████     ██    ██   ██ ███████ ██   ██
+*/
+
+function init(){
+	//Getting the first piece to start the game
+	generateRandomTPiece();
+
+	//Getting the dropping to happen
+	//Also storing the id in a global variable, so that it can be interrupted with clearInterval
+	dropTPieces_intervalID = setInterval(dropTPieces, 1000 * DROPTIME_SECS);
+
+	//Starting the drawing of the game - requestAnimationFrame is used inside draw so it doesn't need to be called repeatedly
+	draw();
 }
 
-//Getting the first piece to start the game
-generateRandomTPiece();
-
-setInterval(dropTPieces, 1000 * DROPTIME_SECS);
-
-draw();
+//Calling init so that the game actually starts
+init();
 
 //MIGHT BE NEEDED FOR DEBUG AGAIN
 /*

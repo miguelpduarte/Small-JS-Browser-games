@@ -248,13 +248,13 @@ function TPiecetoabsBlocks(tpiece) {
 
 function absBlockstoBackground(blocks) {
 
-	var blockXinBlocks;
-	var blockYinBlocks;
+  var blockXinBlocks;
+  var blockYinBlocks;
 
   for (var i = 0; i < blocks.length; i++) {
-		blockXinBlocks = blocks[i].absX / BLOCKWIDTH;
-		blockYinBlocks = blocks[i].absY / BLOCKHEIGHT;
-		blockMap.get(blockXinBlocks).set(blockYinBlocks, blocks[i]);
+    blockXinBlocks = blocks[i].absX / BLOCKWIDTH;
+    blockYinBlocks = blocks[i].absY / BLOCKHEIGHT;
+    blockMap.get(blockXinBlocks).set(blockYinBlocks, blocks[i]);
   }
 
 }
@@ -273,25 +273,25 @@ function generateRandomTPiece() {
 */
 
 //true means it doesn't hit blocks
-function checkIfTPieceDoesntHitBlocks(absBlocks){
-	var blockXinBlocks;
-	var blockYinBlocks;
+function checkIfTPieceDoesntHitBlocks(absBlocks) {
+  var blockXinBlocks;
+  var blockYinBlocks;
 
   for (var i = 0; i < absBlocks.length; i++) {
-		//Calculating the block x and y in blocks instead of pixels
-		blockXinBlocks = absBlocks[i].absX / BLOCKWIDTH;
-		blockYinBlocks = absBlocks[i].absY / BLOCKHEIGHT;
+    //Calculating the block x and y in blocks instead of pixels
+    blockXinBlocks = absBlocks[i].absX / BLOCKWIDTH;
+    blockYinBlocks = absBlocks[i].absY / BLOCKHEIGHT;
 
-		//Checking if there is a background block on the block below using the blockMap
-		if(blockMap.get(blockXinBlocks).get(blockYinBlocks + 1) != 0){
-			//If it is different than 0, there is a block there!
-			//Thus, return false since we will hit a block
-			return false;
-		}
+    //Checking if there is a background block on the block below using the blockMap
+    if (blockMap.get(blockXinBlocks).get(blockYinBlocks + 1) != 0) {
+      //If it is different than 0, there is a block there!
+      //Thus, return false since we will hit a block
+      return false;
+    }
   }
 
-	//No block that will drop will hit any background block, thus we can drop
-	return true;
+  //No block that will drop will hit any background block, thus we can drop
+  return true;
 }
 
 //true means it doesn't hit bottom
@@ -313,13 +313,13 @@ function dropTPieces() {
       //If the piece doesn't hit the bottom, then lower it
       TPieceArr[i].centerY += BLOCKHEIGHT;
     } else {
-			//TPiece has hit blocks or bottom, so:
+      //TPiece has hit blocks or bottom, so:
       //Put the blocks into the "background"
       absBlockstoBackground(blocks);
-			//Remove TPiece from array
-			TPieceArr.splice(i, 1);
-			//Drop new random TPiece
-			generateRandomTPiece();
+      //Remove TPiece from array
+      TPieceArr.splice(i, 1);
+      //Drop new random TPiece
+      generateRandomTPiece();
     }
 
   }
@@ -387,48 +387,51 @@ function shiftTPiecesLeft() {
 ██████  ██   ██ ██   ██  ███ ███  ██ ██   ████  ██████
 */
 
-function drawAbsBlock(block){
-	ctx.beginPath();
-	ctx.rect(block.absX, block.absY, BLOCKWIDTH, BLOCKHEIGHT);
-	ctx.fillStyle = "rgba(" + block.color.r + ", " + block.color.g + ", " + block.color.b + ", " + "1.0)";
-	ctx.fill();
-	ctx.closePath();
+function drawAbsBlock(block) {
+  //Block itself
+  ctx.beginPath();
+  ctx.rect(block.absX, block.absY, BLOCKWIDTH, BLOCKHEIGHT);
+  ctx.fillStyle = "rgba(" + block.color.r + ", " + block.color.g + ", " + block.color.b + ", " + "1.0)";
+  ctx.fill();
+  ctx.closePath();
+  //Inner outline
+  ctx.strokeRect(block.absX, block.absY, BLOCKWIDTH, BLOCKHEIGHT);
 }
 
 function drawTPiece(tpiece) {
   var blocks = TPiecetoabsBlocks(tpiece);
 
   for (var i = 0; i < blocks.length; i++) {
-		drawAbsBlock(blocks[i]);
+    drawAbsBlock(blocks[i]);
   }
 }
 
 function drawBackground() {
   for (var i = 0; i < GAMEWIDTHBLOCKS; i++) {
     for (var j = 0; j < GAMEHEIGHTBLOCKS; j++) {
-			if(blockMap.get(i).get(j) != 0){
-				drawAbsBlock(blockMap.get(i).get(j));
-			}
+      if (blockMap.get(i).get(j) != 0) {
+        drawAbsBlock(blockMap.get(i).get(j));
+      }
     }
   }
 }
 
 //draw stuff here
 function draw() {
-	//Clearing the screen
+  //Clearing the screen
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-	//Drawing the piece that is currently dropping
+  //Drawing the piece that is currently dropping
   for (var i = 0; i < TPieceArr.length; i++) {
     drawTPiece(TPieceArr[i]);
   }
 
   //drawPause(); //TODO
 
-	//drawing the dropped pieces
+  //drawing the dropped pieces
   drawBackground();
 
-	//Makes it so that the draw function is called whenever necessary - makes it so that there is no need to rely on a setInterval function
+  //Makes it so that the draw function is called whenever necessary - makes it so that there is no need to rely on a setInterval function
   requestAnimationFrame(draw);
 }
 
@@ -440,16 +443,16 @@ function draw() {
  ██████     ██    ██   ██ ███████ ██   ██
 */
 
-function init(){
-	//Getting the first piece to start the game
-	generateRandomTPiece();
+function init() {
+  //Getting the first piece to start the game
+  generateRandomTPiece();
 
-	//Getting the dropping to happen
-	//Also storing the id in a global variable, so that it can be interrupted with clearInterval
-	dropTPieces_intervalID = setInterval(dropTPieces, 1000 * DROPTIME_SECS);
+  //Getting the dropping to happen
+  //Also storing the id in a global variable, so that it can be interrupted with clearInterval
+  dropTPieces_intervalID = setInterval(dropTPieces, 1000 * DROPTIME_SECS);
 
-	//Starting the drawing of the game - requestAnimationFrame is used inside draw so it doesn't need to be called repeatedly
-	draw();
+  //Starting the drawing of the game - requestAnimationFrame is used inside draw so it doesn't need to be called repeatedly
+  draw();
 }
 
 //Calling init so that the game actually starts
@@ -464,7 +467,7 @@ function centerWhiteHighlighter(){
 		if(TPieceArr[0].blocks[i].relX == 0 && TPieceArr[0].blocks[i].relY == 0){
 			//Is center piece, paint white
 			TPieceArr[0].blocks[i].color = new Color(255,255,255);
+		}
 	}
-}
 }
 */

@@ -272,6 +272,29 @@ function generateRandomTPiece() {
  ██████  ██████  ███████ ███████ ██ ███████ ██  ██████  ██   ████     ██   ██ ██   ████ ██████      ██      ██  ██████    ████   ███████ ██      ██ ███████ ██   ████    ██
 */
 
+//true means it doesn't hit blocks
+function checkIfTPieceDoesntHitBlocks(absBlocks){
+	var blockXinBlocks;
+	var blockYinBlocks;
+
+  for (var i = 0; i < absBlocks.length; i++) {
+		//Calculating the block x and y in blocks instead of pixels
+		blockXinBlocks = absBlocks[i].absX / BLOCKWIDTH;
+		blockYinBlocks = absBlocks[i].absY / BLOCKHEIGHT;
+
+		//Checking if there is a background block on the block below using the blockMap
+		if(blockMap.get(blockXinBlocks).get(blockYinBlocks + 1) != 0){
+			//If it is different than 0, there is a block there!
+			//Thus, return false since we will hit a block
+			return false;
+		}
+  }
+
+	//No block that will drop will hit any background block, thus we can drop
+	return true;
+}
+
+//true means it doesn't hit bottom
 function checkIfTPieceDoesntHitBottom(absBlocks) {
   for (var i = 0; i < absBlocks.length; i++) {
     if (absBlocks[i].absY + BLOCKHEIGHT >= GAMEHEIGHT)
@@ -286,7 +309,7 @@ function dropTPieces() {
 
     var blocks = TPiecetoabsBlocks(TPieceArr[i]);
 
-    if (checkIfTPieceDoesntHitBottom(blocks)/* && checkIfTPieceDoesntHitBlocks(blocks)*/) {
+    if (checkIfTPieceDoesntHitBottom(blocks) && checkIfTPieceDoesntHitBlocks(blocks)) {
       //If the piece doesn't hit the bottom, then lower it
       TPieceArr[i].centerY += BLOCKHEIGHT;
     } else {

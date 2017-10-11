@@ -55,7 +55,7 @@ var TPieceTypes = [
 	[new Position(0, 0), new Position(1, 0), new Position(0, 1), new Position(-1, 1)], //S-block
 	[new Position(0, 0), new Position(0, 1), new Position(1, 1), new Position(2, 1)], //J-block
 	[new Position(0, 0), new Position(-2, 1), new Position(-1, 1), new Position(0, 1)], //L-block
-	[new Position(0, -2), new Position(0, -1), new Position(0, 0), new Position(0, 1)] //I-block (vertical with 2 above canvas)
+	[new Position(0, 3), new Position(0, 2), new Position(0, 1), new Position(0, 0)] //I-block (vertical with 2 above canvas)
 	];
 //Map that holds the blocks after they have fallen
 var blockMap = new Map();

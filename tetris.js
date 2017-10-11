@@ -46,7 +46,7 @@ var gamePaused = false;
 var dropTPieces_intervalID;
 ////Block holding and config vars
 //Array that will store the pieces as they drop
-var TPieceArr = [];
+var currentTPiece = [];
 //Array that holds the several sets of positions that make the different shapes
 var TPieceTypes = [
 	[new Position(0, 0), new Position(1, 0), new Position(1, 1), new Position(0, 1)], //square (O-block)
@@ -217,7 +217,7 @@ function TPiece(color, relpositions) {
     //rotating CW is x = -y and y = x
 
     for (var i = 0; i < this.blocks.length; i++) {
-      var oldX = TPieceArr[0].blocks[i].relX;
+      var oldX = currentTPiece.blocks[i].relX;
       this.blocks[i].relX = -this.blocks[i].relY;
       this.blocks[i].relY = oldX;
     }
@@ -228,7 +228,7 @@ function TPiece(color, relpositions) {
     //Simillarly, rotating CCW is x = y and y = -x
 
     for (var i = 0; i < this.blocks.length; i++) {
-      var oldX = TPieceArr[0].blocks[i].relX;
+      var oldX = currentTPiece.blocks[i].relX;
       this.blocks[i].relX = this.blocks[i].relY;
       this.blocks[i].relY = -oldX;
     }
@@ -268,7 +268,7 @@ function absBlockstoBackground(blocks) {
 
 //Generates a random TPiece at the middle top of the game screen
 function generateRandomTPiece() {
-  TPieceArr.push(new TPiece(new Color(Math.floor(Math.random() * 256), Math.floor(Math.random() * 256), Math.floor(Math.random() * 256)), TPieceTypes[Math.floor(Math.random() * TPieceTypes.length)]));
+  currentTPiece = new TPiece(new Color(Math.floor(Math.random() * 256), Math.floor(Math.random() * 256), Math.floor(Math.random() * 256)), TPieceTypes[Math.floor(Math.random() * TPieceTypes.length)]);
 }
 
 /*
@@ -282,19 +282,17 @@ function generateRandomTPiece() {
 function hardDrop() {
   while (true) {
 
-    var blocks = TPiecetoabsBlocks(TPieceArr[0]);
+    var blocks = TPiecetoabsBlocks(currentTPiece);
 
     if (checkIfTPieceDoesntHitBottom(blocks) && checkIfTPieceDoesntHitBlocks(blocks)) {
       //If the piece doesn't hit the bottom, then lower it
-      TPieceArr[0].centerY += BLOCKHEIGHT;
+      currentTPiece.centerY += BLOCKHEIGHT;
     } else {
-      //TPiece has hit blocks or bottom, so:
-      //Put the blocks into the "background"
-      absBlockstoBackground(blocks);
-      //Remove TPiece from array
-      TPieceArr.splice(0, 1);
-      //Drop new random TPiece
-      generateRandomTPiece();
+			//TPiece has hit blocks or bottom, so:
+			//Put the blocks into the "background"
+			absBlockstoBackground(blocks);
+			//Drop new random TPiece (also deletes current TPiece)
+			generateRandomTPiece();
       //breaks the loop to stop further dropping
       break;
     }
@@ -303,9 +301,7 @@ function hardDrop() {
 }
 
 function softDrop() {
-  for (var i = 0; i < TPieceArr.length; i++) {
-    dropTPieces();
-  }
+  dropTPieces();
 }
 
 //true means it doesn't hit blocks
@@ -341,35 +337,30 @@ function checkIfTPieceDoesntHitBottom(absBlocks) {
 }
 
 function dropTPieces() {
-  for (var i = 0; i < TPieceArr.length; i++) {
 
-    var blocks = TPiecetoabsBlocks(TPieceArr[i]);
+    var blocks = TPiecetoabsBlocks(currentTPiece);
 
     if (checkIfTPieceDoesntHitBottom(blocks) && checkIfTPieceDoesntHitBlocks(blocks)) {
       //If the piece doesn't hit the bottom, then lower it
-      TPieceArr[i].centerY += BLOCKHEIGHT;
+      currentTPiece.centerY += BLOCKHEIGHT;
     } else {
       //TPiece has hit blocks or bottom, so:
       //Put the blocks into the "background"
       absBlockstoBackground(blocks);
-      //Remove TPiece from array
-      TPieceArr.splice(i, 1);
-      //Drop new random TPiece
+      //Drop new random TPiece (also deletes current TPiece)
       generateRandomTPiece();
     }
-
-  }
 }
 
 function rotateTPiecesCW() {
-  for (var i = 0; i < TPieceArr.length; i++) {
-    TPieceArr[i].rotateCW();
+  for (var i = 0; i < currentTPiece.length; i++) {
+    currentTPiece[i].rotateCW();
   }
 }
 
 function rotateTPiecesCCW() {
-  for (var i = 0; i < TPieceArr.length; i++) {
-    TPieceArr[i].rotateCCW();
+  for (var i = 0; i < currentTPiece.length; i++) {
+    currentTPiece[i].rotateCCW();
   }
 }
 
@@ -383,13 +374,13 @@ function checkIfTPieceDoesntHitRight(absBlocks) {
 }
 
 function shiftTPiecesRight() {
-  for (var i = 0; i < TPieceArr.length; i++) {
+  for (var i = 0; i < currentTPiece.length; i++) {
 
-    var blocks = TPiecetoabsBlocks(TPieceArr[i]);
+    var blocks = TPiecetoabsBlocks(currentTPiece[i]);
 
     if (checkIfTPieceDoesntHitRight(blocks)) {
       //If the piece doesn't hit the right, then shift it
-      TPieceArr[i].centerX += BLOCKWIDTH;
+      currentTPiece[i].centerX += BLOCKWIDTH;
     }
   }
 }
@@ -404,13 +395,13 @@ function checkIfTPieceDoesntHitLeft(absBlocks) {
 }
 
 function shiftTPiecesLeft() {
-  for (var i = 0; i < TPieceArr.length; i++) {
+  for (var i = 0; i < currentTPiece.length; i++) {
 
-    var blocks = TPiecetoabsBlocks(TPieceArr[i]);
+    var blocks = TPiecetoabsBlocks(currentTPiece[i]);
 
     if (checkIfTPieceDoesntHitLeft(blocks)) {
       //If the piece doesn't hit the left, then shift it
-      TPieceArr[i].centerX -= BLOCKWIDTH;
+      currentTPiece[i].centerX -= BLOCKWIDTH;
     }
   }
 }
@@ -458,9 +449,7 @@ function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   //Drawing the piece that is currently dropping
-  for (var i = 0; i < TPieceArr.length; i++) {
-    drawTPiece(TPieceArr[i]);
-  }
+  drawTPiece(currentTPiece);
 
   //drawPause(); //TODO
 
@@ -502,10 +491,10 @@ init();
 
 //Paints all the centers white
 function centerWhiteHighlighter(){
-	for(var i = 0; i < TPieceArr[0].blocks.length; i++){
-		if(TPieceArr[0].blocks[i].relX == 0 && TPieceArr[0].blocks[i].relY == 0){
+	for(var i = 0; i < currentTPiece.blocks.length; i++){
+		if(currentTPiece.blocks[i].relX == 0 && currentTPiece.blocks[i].relY == 0){
 			//Is center piece, paint white
-			TPieceArr[0].blocks[i].color = new Color(255,255,255);
+			currentTPiece.blocks[i].color = new Color(255,255,255);
 		}
 	}
 }

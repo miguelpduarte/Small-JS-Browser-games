@@ -288,11 +288,11 @@ function hardDrop() {
       //If the piece doesn't hit the bottom, then lower it
       currentTPiece.centerY += BLOCKHEIGHT;
     } else {
-			//TPiece has hit blocks or bottom, so:
-			//Put the blocks into the "background"
-			absBlockstoBackground(blocks);
-			//Drop new random TPiece (also deletes current TPiece)
-			generateRandomTPiece();
+      //TPiece has hit blocks or bottom, so:
+      //Put the blocks into the "background"
+      absBlockstoBackground(blocks);
+      //Drop new random TPiece (also deletes current TPiece)
+      generateRandomTPiece();
       //breaks the loop to stop further dropping
       break;
     }
@@ -338,30 +338,26 @@ function checkIfTPieceDoesntHitBottom(absBlocks) {
 
 function dropTPieces() {
 
-    var blocks = TPiecetoabsBlocks(currentTPiece);
+  var blocks = TPiecetoabsBlocks(currentTPiece);
 
-    if (checkIfTPieceDoesntHitBottom(blocks) && checkIfTPieceDoesntHitBlocks(blocks)) {
-      //If the piece doesn't hit the bottom, then lower it
-      currentTPiece.centerY += BLOCKHEIGHT;
-    } else {
-      //TPiece has hit blocks or bottom, so:
-      //Put the blocks into the "background"
-      absBlockstoBackground(blocks);
-      //Drop new random TPiece (also deletes current TPiece)
-      generateRandomTPiece();
-    }
+  if (checkIfTPieceDoesntHitBottom(blocks) && checkIfTPieceDoesntHitBlocks(blocks)) {
+    //If the piece doesn't hit the bottom, then lower it
+    currentTPiece.centerY += BLOCKHEIGHT;
+  } else {
+    //TPiece has hit blocks or bottom, so:
+    //Put the blocks into the "background"
+    absBlockstoBackground(blocks);
+    //Drop new random TPiece (also deletes current TPiece)
+    generateRandomTPiece();
+  }
 }
 
 function rotateTPiecesCW() {
-  for (var i = 0; i < currentTPiece.length; i++) {
-    currentTPiece[i].rotateCW();
-  }
+  currentTPiece.rotateCW();
 }
 
 function rotateTPiecesCCW() {
-  for (var i = 0; i < currentTPiece.length; i++) {
-    currentTPiece[i].rotateCCW();
-  }
+  currentTPiece.rotateCCW();
 }
 
 function checkIfTPieceDoesntHitRight(absBlocks) {
@@ -374,14 +370,11 @@ function checkIfTPieceDoesntHitRight(absBlocks) {
 }
 
 function shiftTPiecesRight() {
-  for (var i = 0; i < currentTPiece.length; i++) {
+  var blocks = TPiecetoabsBlocks(currentTPiece);
 
-    var blocks = TPiecetoabsBlocks(currentTPiece[i]);
-
-    if (checkIfTPieceDoesntHitRight(blocks)) {
-      //If the piece doesn't hit the right, then shift it
-      currentTPiece[i].centerX += BLOCKWIDTH;
-    }
+  if (checkIfTPieceDoesntHitRight(blocks)) {
+    //If the piece doesn't hit the right, then shift it
+    currentTPiece.centerX += BLOCKWIDTH;
   }
 }
 
@@ -395,14 +388,12 @@ function checkIfTPieceDoesntHitLeft(absBlocks) {
 }
 
 function shiftTPiecesLeft() {
-  for (var i = 0; i < currentTPiece.length; i++) {
 
-    var blocks = TPiecetoabsBlocks(currentTPiece[i]);
+  var blocks = TPiecetoabsBlocks(currentTPiece);
 
-    if (checkIfTPieceDoesntHitLeft(blocks)) {
-      //If the piece doesn't hit the left, then shift it
-      currentTPiece[i].centerX -= BLOCKWIDTH;
-    }
+  if (checkIfTPieceDoesntHitLeft(blocks)) {
+    //If the piece doesn't hit the left, then shift it
+    currentTPiece.centerX -= BLOCKWIDTH;
   }
 }
 

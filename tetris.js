@@ -42,10 +42,8 @@ var ctx = canvas.getContext("2d");
 
 var score = 0;
 var gamePaused = false;
-//the height of the game grid, in blocks
-var gamegridHeight = 32;
-//the width of the game grid, in blocks
-var gamegridWidth = 17;
+//The var to use with setInterval and clearInterval, for dropping TPieces
+var dropTPieces_intervalID;
 ////Block holding and config vars
 //Array that will store the pieces as they drop
 var TPieceArr = [];
@@ -81,7 +79,7 @@ for (var i = 0; i < GAMEWIDTHBLOCKS; i++) {
 */
 
 //var upPressed = false;
-var downPressed = false;
+//var downPressed = false;
 //var leftPressed = false;
 //var rightPressed = false;
 var wPressed = false;
@@ -99,13 +97,21 @@ function keyDownHandler(e) {
     gamePaused = !gamePaused;
   }
 
+  //Spacebar
+  if (e.keyCode == 32) {
+    hardDrop();
+  }
+
   //Up arrow
   if (e.keyCode == 38) {
     rotateTPiecesCW();
   }
   //Down arrow
   else if (e.keyCode == 40) {
-    downPressed = true;
+    //TODO: To decide if going to be done with bool or just for each keypress (aka while down)
+    //NOTE: If going to do that don't forget to uncomment the necessary tidbits
+    //downPressed = true;
+    softDrop();
   }
   //Left arrow
   else if (e.keyCode == 37) {
@@ -128,11 +134,12 @@ function keyDownHandler(e) {
 function keyUpHandler(e) {
   //Up arrow
   if (e.keyCode == 38) {
+    //Unnecessary, for each press rotate instead
     //upPressed = false;
   }
   //Down arrow
   else if (e.keyCode == 40) {
-    downPressed = false;
+    //downPressed = false;
   }
   //Left arrow
   else if (e.KeyCode == 37) {
@@ -271,6 +278,35 @@ function generateRandomTPiece() {
 ██      ██    ██ ██      ██      ██      ██ ██ ██    ██ ██  ██ ██     ██   ██ ██  ██ ██ ██   ██     ██  ██  ██ ██    ██  ██  ██  ██      ██  ██  ██ ██      ██  ██ ██    ██
  ██████  ██████  ███████ ███████ ██ ███████ ██  ██████  ██   ████     ██   ██ ██   ████ ██████      ██      ██  ██████    ████   ███████ ██      ██ ███████ ██   ████    ██
 */
+
+function hardDrop() {
+  while (true) {
+
+    var blocks = TPiecetoabsBlocks(TPieceArr[0]);
+
+    if (checkIfTPieceDoesntHitBottom(blocks) && checkIfTPieceDoesntHitBlocks(blocks)) {
+      //If the piece doesn't hit the bottom, then lower it
+      TPieceArr[0].centerY += BLOCKHEIGHT;
+    } else {
+      //TPiece has hit blocks or bottom, so:
+      //Put the blocks into the "background"
+      absBlockstoBackground(blocks);
+      //Remove TPiece from array
+      TPieceArr.splice(0, 1);
+      //Drop new random TPiece
+      generateRandomTPiece();
+      //breaks the loop to stop further dropping
+      break;
+    }
+
+  }
+}
+
+function softDrop() {
+  for (var i = 0; i < TPieceArr.length; i++) {
+    dropTPieces();
+  }
+}
 
 //true means it doesn't hit blocks
 function checkIfTPieceDoesntHitBlocks(absBlocks) {
@@ -444,6 +480,9 @@ function draw() {
 */
 
 function init() {
+  //Setting the page title
+  document.title = 'Tetris Clone!';
+
   //Getting the first piece to start the game
   generateRandomTPiece();
 

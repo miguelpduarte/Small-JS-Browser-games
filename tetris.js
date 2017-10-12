@@ -9,7 +9,7 @@
 var BLOCKPADDINGPX = 18;
 var BLOCKHEIGHT = 18;
 var BLOCKWIDTH = 18;
-var GAMEHEIGHTBLOCKS = 30;
+var GAMEHEIGHTBLOCKS = 32;
 var GAMEHEIGHT = GAMEHEIGHTBLOCKS * BLOCKHEIGHT;
 var GAMEWIDTHBLOCKS = 15;
 var GAMEWIDTH = GAMEWIDTHBLOCKS * BLOCKWIDTH;
@@ -313,6 +313,17 @@ function checkIfTPieceDoesntHitBlocks(absBlocks) {
     //Calculating the block x and y in blocks instead of pixels
     blockXinBlocks = absBlocks[i].absX / BLOCKWIDTH;
     blockYinBlocks = absBlocks[i].absY / BLOCKHEIGHT;
+
+		//In case the block is rotating out of the screen, rotation kick
+		//exits from the screen right, kick 1 block left
+		if(blockXinBlocks > GAMEWIDTHBLOCKS){
+			currentTPiece.centerX -= BLOCKWIDTH;
+			//TODO: Test if is bad idea
+		}
+		//exits from the screen left, kick 1 block right
+		if(blockXinBlocks < 0){
+			currentTPiece.centerX += BLOCKWIDTH;
+		}
 
     //Checking if there is a background block on the block below using the blockMap
     if (blockMap.get(blockXinBlocks).get(blockYinBlocks + 1) != 0) {

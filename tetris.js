@@ -173,6 +173,8 @@ function Color(r, g, b) {
   this.r = r;
   this.g = g;
   this.b = b;
+	//Opacity, default is 1.0 for full brightness, minimum is 0.0
+	this.alpha = 1.0;
 }
 
 //relBlock is a block with relative positions, in relation to the block center (relX, relY)
@@ -318,15 +320,28 @@ function generateRandomTPiece() {
   currentTPiece = new TPiece(new Color(Math.floor(Math.random() * 256), Math.floor(Math.random() * 256), Math.floor(Math.random() * 256)), TPieceTypes[Math.floor(Math.random() * TPieceTypes.length)]);
 }
 
+/*
+██      ██ ███    ██ ███████      ██████ ██      ███████  █████  ██████  ██ ███    ██  ██████       █████  ███    ██ ██████      ███████  ██████  ██████  ██████  ██ ███    ██  ██████
+██      ██ ████   ██ ██          ██      ██      ██      ██   ██ ██   ██ ██ ████   ██ ██           ██   ██ ████   ██ ██   ██     ██      ██      ██    ██ ██   ██ ██ ████   ██ ██
+██      ██ ██ ██  ██ █████       ██      ██      █████   ███████ ██████  ██ ██ ██  ██ ██   ███     ███████ ██ ██  ██ ██   ██     ███████ ██      ██    ██ ██████  ██ ██ ██  ██ ██   ███
+██      ██ ██  ██ ██ ██          ██      ██      ██      ██   ██ ██   ██ ██ ██  ██ ██ ██    ██     ██   ██ ██  ██ ██ ██   ██          ██ ██      ██    ██ ██   ██ ██ ██  ██ ██ ██    ██
+███████ ██ ██   ████ ███████      ██████ ███████ ███████ ██   ██ ██   ██ ██ ██   ████  ██████      ██   ██ ██   ████ ██████      ███████  ██████  ██████  ██   ██ ██ ██   ████  ██████
+*/
+
+//Progressively drops the opacity of the blocks in a line
+function dropOpacity(lineX){
+
+}
+
 function verifyLineClears(absBlocks){
 
 }
 
-function clearLine(xToClear){
+function clearLine(lineX){
 
 }
 
-//Considering naive gravity
+//Considering naive gravity (line drops until any block hits another one) because it is the easiest to code lol
 function dropLinesAbove(xToDropTo){
 
 }
@@ -502,10 +517,11 @@ function drawAbsBlock(block) {
   //Block itself
   ctx.beginPath();
   ctx.rect(block.absX, block.absY, BLOCKWIDTH, BLOCKHEIGHT);
-  ctx.fillStyle = "rgba(" + block.color.r + ", " + block.color.g + ", " + block.color.b + ", " + "1.0)";
+  ctx.fillStyle = "rgba(" + block.color.r + ", " + block.color.g + ", " + block.color.b + ", " + block.color.alpha + ")";
   ctx.fill();
   ctx.closePath();
   //Inner outline
+	ctx.strokeStyle = "rgba(0, 0, 0, " + block.color.alpha + ")"; //The stroke uses the block alpha so that it will fade along with the regular block color
   ctx.strokeRect(block.absX, block.absY, BLOCKWIDTH, BLOCKHEIGHT);
 }
 

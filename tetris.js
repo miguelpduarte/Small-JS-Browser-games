@@ -49,13 +49,13 @@ var dropTPieces_intervalID;
 var currentTPiece = [];
 //Array that holds the several sets of positions that make the different shapes
 var TPieceTypes = [
-	[new Position(0, 0), new Position(1, 0), new Position(1, 1), new Position(0, 1)], //square (O-block)
+	[new Position(0, 0), new Position(0, 1), new Position(1, 0), new Position(1, 1)], //square (O-block)
 	[new Position(0, 0), new Position(1, 0), new Position(1, 1), new Position(2, 1)], //Z-block
 	[new Position(0, 0), new Position(0, 1), new Position(-1, 1), new Position(1, 1)], //T-block
 	[new Position(0, 0), new Position(1, 0), new Position(0, 1), new Position(-1, 1)], //S-block
-	[new Position(0, 0), new Position(0, 1), new Position(1, 1), new Position(2, 1)], //J-block
+	[new Position(-1, -1), new Position(-1, 0), new Position(0, 0), new Position(1, 0)], //J-block
 	[new Position(0, 0), new Position(-2, 1), new Position(-1, 1), new Position(0, 1)], //L-block
-	[new Position(0, 3), new Position(0, 2), new Position(0, 1), new Position(0, 0)] //I-block (vertical with 2 above canvas)
+	[new Position(0, 2), new Position(0, 1), new Position(0, 0), new Position(0, -1)] //I-block (vertical with 2 above canvas)
 	];
 //Map that holds the blocks after they have fallen
 var blockMap = new Map();
@@ -330,7 +330,7 @@ function hardDrop() {
 
     var blocks = TPiecetoabsBlocks(currentTPiece);
 
-    if (checkIfTPieceDoesntHitBottom(blocks) && checkIfTPieceDoesntHitBlocks(blocks)) {
+    if (checkIfTPieceDoesntHitBottom(blocks) && checkIfTPieceDoesntHitBottomBlocks(blocks)) {
       //If the piece doesn't hit the bottom, then lower it
       currentTPiece.centerY += BLOCKHEIGHT;
     } else {
@@ -350,15 +350,15 @@ function softDrop() {
   dropTPieces();
 }
 
-//true means it doesn't hit blocks
-function checkIfTPieceDoesntHitBlocks(absBlocks) {
-  var blockXinBlocks;
+//true means it doesn't hit blocks (for drop movement)
+function checkIfTPieceDoesntHitBottomBlocks(absBlocks) {
   var blockYinBlocks;
+	var blockXinBlocks;
 
   for (var i = 0; i < absBlocks.length; i++) {
-    //Calculating the block x and y in blocks instead of pixels
-    blockXinBlocks = absBlocks[i].absX / BLOCKWIDTH;
-    blockYinBlocks = absBlocks[i].absY / BLOCKHEIGHT;
+    //Calculating the block y in blocks instead of pixels
+    blockYinBlocks = Math.floor(absBlocks[i].absY / BLOCKHEIGHT);
+		blockXinBlocks = Math.floor(absBlocks[i].absX / BLOCKWIDTH);
 
     //Checking if there is a background block on the block below using the blockMap
     if (blockMap.get(blockXinBlocks).get(blockYinBlocks + 1) != 0) {
@@ -386,7 +386,7 @@ function dropTPieces() {
 
   var blocks = TPiecetoabsBlocks(currentTPiece);
 
-  if (checkIfTPieceDoesntHitBottom(blocks) && checkIfTPieceDoesntHitBlocks(blocks)) {
+  if (checkIfTPieceDoesntHitBottom(blocks) && checkIfTPieceDoesntHitBottomBlocks(blocks)) {
     //If the piece doesn't hit the bottom, then lower it
     currentTPiece.centerY += BLOCKHEIGHT;
   } else {
@@ -407,12 +407,31 @@ function rotateTPiecesCCW() {
 }
 
 function checkIfTPieceDoesntHitRight(absBlocks) {
+	//Colliding with walls
   for (var i = 0; i < absBlocks.length; i++) {
     if (absBlocks[i].absX + BLOCKWIDTH >= GAMEWIDTH)
       return false;
   }
 
-  return true;
+	//Colliding with blocks
+	var blockXinBlocks;
+	var blockYinBlocks;
+
+	for (var j = 0; j < absBlocks.length; j++) {
+		//Calculating the block x in blocks instead of pixels
+		blockXinBlocks = Math.floor(absBlocks[j].absX / BLOCKWIDTH);
+		blockYinBlocks = Math.floor(absBlocks[j].absY / BLOCKHEIGHT);
+
+		//Checking if there is a background block on the block right using the blockMap
+		if (blockMap.get(blockXinBlocks + 1).get(blockYinBlocks) != 0) {
+			//If it is different than 0, there is a block there!
+			//Thus, return false since we will hit a block
+			return false;
+		}
+	}
+
+	//TODO: Write comment
+	return true;
 }
 
 function shiftTPiecesRight() {
@@ -430,6 +449,24 @@ function checkIfTPieceDoesntHitLeft(absBlocks) {
       return false;
   }
 
+	//Colliding with blocks
+	var blockXinBlocks;
+	var blockYinBlocks;
+
+	for (var j = 0; j < absBlocks.length; j++) {
+		//Calculating the block x in blocks instead of pixels
+		blockXinBlocks = Math.floor(absBlocks[j].absX / BLOCKWIDTH);
+		blockYinBlocks = Math.floor(absBlocks[j].absY / BLOCKHEIGHT);
+
+		//Checking if there is a background block on the block left using the blockMap
+		if (blockMap.get(blockXinBlocks - 1).get(blockYinBlocks) != 0) {
+			//If it is different than 0, there is a block there!
+			//Thus, return false since we will hit a block
+			return false;
+		}
+	}
+
+	//TODO: Write comment 2
   return true;
 }
 

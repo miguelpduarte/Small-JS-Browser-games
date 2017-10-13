@@ -50,12 +50,12 @@ var currentTPiece = [];
 //Array that holds the several sets of positions that make the different shapes
 var TPieceTypes = [
 	[new Position(0, 0), new Position(0, 1), new Position(1, 0), new Position(1, 1)], //square (O-block)
-	[new Position(0, 0), new Position(1, 0), new Position(1, 1), new Position(2, 1)], //Z-block
-	[new Position(0, 0), new Position(0, 1), new Position(-1, 1), new Position(1, 1)], //T-block
-	[new Position(0, 0), new Position(1, 0), new Position(0, 1), new Position(-1, 1)], //S-block
+	[new Position(0, -1), new Position(0, 0), new Position(1, 0), new Position(-1, -1)], //Z-block
+	[new Position(0, -1), new Position(0, 0), new Position(-1, 0), new Position(1, 0)], //T-block
+	[new Position(-1, 0), new Position(0, 0), new Position(0, -1), new Position(1, -1)], //S-block
 	[new Position(-1, -1), new Position(-1, 0), new Position(0, 0), new Position(1, 0)], //J-block
-	[new Position(0, 0), new Position(-2, 1), new Position(-1, 1), new Position(0, 1)], //L-block
-	[new Position(0, 2), new Position(0, 1), new Position(0, 0), new Position(0, -1)] //I-block (vertical with 2 above canvas)
+	[new Position(1, -1), new Position(-1, 0), new Position(0, 0), new Position(1, 0)], //L-block
+	[new Position(0, 2), new Position(0, 1), new Position(0, 0), new Position(0, -1)] //I-block (vertical with 1 above canvas)
 	];
 //Map that holds the blocks after they have fallen
 var blockMap = new Map();
@@ -82,7 +82,7 @@ for (var i = 0; i < GAMEWIDTHBLOCKS; i++) {
 //var downPressed = false;
 //var leftPressed = false;
 //var rightPressed = false;
-var wPressed = false;
+//var wPressed = false;
 var sPressed = false;
 
 var gamePaused = false;
@@ -123,7 +123,8 @@ function keyDownHandler(e) {
   }
   //W
   else if (e.keyCode == 87) {
-    wPressed = true;
+    //wPressed = true; //Unnecessary
+		rotateTPiecesCCW();
   }
   //S
   else if (e.keyCode == 83) {
@@ -210,7 +211,7 @@ function TPiece(color, relpositions) {
   }
 
   this.centerX = GAMEMIDDLE;
-  this.centerY = 0;
+  this.centerY = BLOCKHEIGHT; //Starting one block below to stop problems with blocks stuck on top
 
 	//In case the block is rotating out of the game screen, rotation kick
   this.kicks = function() {
@@ -317,6 +318,19 @@ function generateRandomTPiece() {
   currentTPiece = new TPiece(new Color(Math.floor(Math.random() * 256), Math.floor(Math.random() * 256), Math.floor(Math.random() * 256)), TPieceTypes[Math.floor(Math.random() * TPieceTypes.length)]);
 }
 
+function verifyLineClears(absBlocks){
+
+}
+
+function clearLine(xToClear){
+
+}
+
+//Considering naive gravity
+function dropLinesAbove(xToDropTo){
+
+}
+
 /*
  ██████  ██████  ██      ██      ██ ███████ ██  ██████  ███    ██      █████  ███    ██ ██████      ███    ███  ██████  ██    ██ ███████ ███    ███ ███████ ███    ██ ████████
 ██      ██    ██ ██      ██      ██ ██      ██ ██    ██ ████   ██     ██   ██ ████   ██ ██   ██     ████  ████ ██    ██ ██    ██ ██      ████  ████ ██      ████   ██    ██
@@ -327,22 +341,9 @@ function generateRandomTPiece() {
 
 function hardDrop() {
   while (true) {
-
-    var blocks = TPiecetoabsBlocks(currentTPiece);
-
-    if (checkIfTPieceDoesntHitBottom(blocks) && checkIfTPieceDoesntHitBottomBlocks(blocks)) {
-      //If the piece doesn't hit the bottom, then lower it
-      currentTPiece.centerY += BLOCKHEIGHT;
-    } else {
-      //TPiece has hit blocks or bottom, so:
-      //Put the blocks into the "background"
-      absBlockstoBackground(blocks);
-      //Drop new random TPiece (also deletes current TPiece)
-      generateRandomTPiece();
-      //breaks the loop to stop further dropping
-      break;
-    }
-
+		if(dropTPieces() == -1)
+			//-1 return value means that the piece was successfully dropped until the end so we break the loop
+			break;
   }
 }
 
@@ -389,12 +390,21 @@ function dropTPieces() {
   if (checkIfTPieceDoesntHitBottom(blocks) && checkIfTPieceDoesntHitBottomBlocks(blocks)) {
     //If the piece doesn't hit the bottom, then lower it
     currentTPiece.centerY += BLOCKHEIGHT;
+
+		//returning something other than -1 because of hardDrop's loop ._.
+		return 0;
   } else {
     //TPiece has hit blocks or bottom, so:
     //Put the blocks into the "background"
     absBlockstoBackground(blocks);
     //Drop new random TPiece (also deletes current TPiece)
     generateRandomTPiece();
+
+		//Verifying line clears with the blocks of the now dropped TPiece (absBlocks are still preserved in 'blocks' variable)
+		verifyLineClears(blocks);
+
+		//returning -1 so that hardDrop's loop works lol
+		return -1;
   }
 }
 

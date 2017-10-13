@@ -212,6 +212,46 @@ function TPiece(color, relpositions) {
   this.centerX = GAMEMIDDLE;
   this.centerY = 0;
 
+	//In case the block is rotating out of the game screen, rotation kick
+  this.kicks = function() {
+
+		var blocks = TPiecetoabsBlocks(this);
+
+    for (var i = 0; i < blocks.length; i++) {
+			var blockXinBlocks = Math.floor(blocks[i].absX / BLOCKWIDTH);
+			//var blockYinBlocks = Math.floor(this.blocks[i].absY / BLOCKHEIGHT);
+
+      while (1) {
+        //Block exits from the screen right, kick 1 block left
+        if (blockXinBlocks >= GAMEWIDTHBLOCKS) {
+					//Moving the TPiece
+          this.centerX -= BLOCKWIDTH;
+					//Updating the var for further comparisons
+					blockXinBlocks--;
+					//To check again for other conditions
+          continue;
+        }
+
+        //Block exits from the screen left, kick 1 block right
+        if (blockXinBlocks < 0) {
+					//Moving the TPiece
+          this.centerX += BLOCKWIDTH;
+					//Updating the var for further comparisons
+					blockXinBlocks++;
+					//To check again for other conditions
+					continue;
+        }
+
+				//TODO: floor kicks
+
+
+				//If no test is run, no kicks are to be done anymore, break the loop
+				break;
+      }
+
+    }
+  };
+
   this.rotateCW = function() {
 
     //rotating CW is x = -y and y = x
@@ -221,6 +261,9 @@ function TPiece(color, relpositions) {
       this.blocks[i].relX = -this.blocks[i].relY;
       this.blocks[i].relY = oldX;
     }
+
+		//Checking and executing floor and wall kicks
+		this.kicks();
   };
 
   this.rotateCCW = function() {
@@ -232,6 +275,9 @@ function TPiece(color, relpositions) {
       this.blocks[i].relX = this.blocks[i].relY;
       this.blocks[i].relY = -oldX;
     }
+
+		//Checking and executing floor and wall kicks
+		this.kicks();
   };
 }
 
@@ -313,17 +359,6 @@ function checkIfTPieceDoesntHitBlocks(absBlocks) {
     //Calculating the block x and y in blocks instead of pixels
     blockXinBlocks = absBlocks[i].absX / BLOCKWIDTH;
     blockYinBlocks = absBlocks[i].absY / BLOCKHEIGHT;
-
-		//In case the block is rotating out of the screen, rotation kick
-		//exits from the screen right, kick 1 block left
-		if(blockXinBlocks > GAMEWIDTHBLOCKS){
-			currentTPiece.centerX -= BLOCKWIDTH;
-			//TODO: Test if is bad idea
-		}
-		//exits from the screen left, kick 1 block right
-		if(blockXinBlocks < 0){
-			currentTPiece.centerX += BLOCKWIDTH;
-		}
 
     //Checking if there is a background block on the block below using the blockMap
     if (blockMap.get(blockXinBlocks).get(blockYinBlocks + 1) != 0) {

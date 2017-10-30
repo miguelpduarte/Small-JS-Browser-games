@@ -328,22 +328,54 @@ function generateRandomTPiece() {
 ███████ ██ ██   ████ ███████      ██████ ███████ ███████ ██   ██ ██   ██ ██ ██   ████  ██████      ██   ██ ██   ████ ██████      ███████  ██████  ██████  ██   ██ ██ ██   ████  ██████
 */
 
-//Progressively drops the opacity of the blocks in a line
-function dropOpacity(lineX){
+//Progressively drops the opacity of the blocks in a line (until 0, when it returns)
+function dropOpacity(lineY){
 
+}
+
+function isLineFull(lineY){
+	//Going through the line
+	for(var x = 0; x < blockMap.size; x++){
+		//If a 0 is found, a block is not there so the line isn't full
+		if(blockMap.get(x).get(lineY) == 0)
+			return false;
+	}
+
+	return true;
 }
 
 function verifyLineClears(absBlocks){
+	//The passed blocks are now in the 'background' aka blockMap
+	for(var blocki = 0; blocki < absBlocks.length; blocki++){
+		//Going through each block and checking if the line to which it was dropped is now full
+		//Calculating the block Y
+		blockYinBlocks = absBlocks[blocki].absY / BLOCKHEIGHT;
 
+		//Checking if the line of this block is full
+		if(isLineFull(blockYinBlocks)){
+			//If the line is full, clear the line and then drop the blocks above
+			clearLine(blockYinBlocks);
+			dropLinesAbove(blockYinBlocks);
+		}
+	}
 }
 
-function clearLine(lineX){
-
+function clearLine(lineY){
+	for(var x = 0; x < GAMEWIDTHBLOCKS; x++){
+		//Deletes the block at (x, lineY)
+		blockMap.get(x).set(lineY, 0);
+	}
 }
 
 //Considering naive gravity (line drops until any block hits another one) because it is the easiest to code lol
-function dropLinesAbove(xToDropTo){
-
+function dropLinesAbove(yToDropTo){
+	//TODO: Change to naive gravity, for now just dropping once for testing
+	//Going though the lines in reverse because it makes more sense
+	for(var y = yToDropTo - 1; y >= 0 ; y--){
+		for(var x = 0; x < GAMEWIDTHBLOCKS; x++){
+			blockMap.get(x).set(y+1, blockMap.get(x).get(y));
+		}
+	}
 }
 
 /*
@@ -416,6 +448,7 @@ function dropTPieces() {
     generateRandomTPiece();
 
 		//Verifying line clears with the blocks of the now dropped TPiece (absBlocks are still preserved in 'blocks' variable)
+		//The blocks in the variable have not been shifted down, though
 		verifyLineClears(blocks);
 
 		//returning -1 so that hardDrop's loop works lol

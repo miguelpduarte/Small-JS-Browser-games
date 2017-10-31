@@ -62,11 +62,11 @@ var blockMap = new Map();
 
 //IDEA: Move to inside init ?
 //Generating an empty blockMap to eventually hold the dropped absBlock
-for (var i = 0; i < GAMEWIDTHBLOCKS; i++) {
-  blockMap.set(i, new Map());
-  for (var j = 0; j < GAMEHEIGHTBLOCKS; j++) {
+for (var x = 0; x < GAMEWIDTHBLOCKS; x++) {
+  blockMap.set(x, new Map());
+  for (var y = 0; y < GAMEHEIGHTBLOCKS; y++) {
     //Initializing with a 0 to make comparisons easier to know if there is an item there or not
-    blockMap.get(i).set(j, 0);
+    blockMap.get(x).set(y, 0);
   }
 }
 
@@ -310,7 +310,7 @@ function absBlockstoBackground(blocks) {
   for (var i = 0; i < blocks.length; i++) {
     blockXinBlocks = blocks[i].absX / BLOCKWIDTH;
     blockYinBlocks = blocks[i].absY / BLOCKHEIGHT;
-    blockMap.get(blockXinBlocks).set(blockYinBlocks, blocks[i]);
+    blockMap.get(blockXinBlocks).set(blockYinBlocks, blocks[i].color);
   }
 
 }
@@ -356,6 +356,11 @@ function verifyLineClears(absBlocks){
 			//If the line is full, clear the line and then drop the blocks above
 			clearLine(blockYinBlocks);
 			dropLinesAbove(blockYinBlocks);
+			//Also update score
+			score++;
+			//TODO: Print score, for now this should work
+			console.log(score);
+			//TODO: Also recheck line clears
 		}
 	}
 }
@@ -546,6 +551,18 @@ function shiftTPiecesLeft() {
 ██████  ██   ██ ██   ██  ███ ███  ██ ██   ████  ██████
 */
 
+function drawBGBlock(xblocks, yblocks, color){
+	//Block itself
+  ctx.beginPath();
+  ctx.rect(xblocks * BLOCKWIDTH, yblocks * BLOCKHEIGHT, BLOCKWIDTH, BLOCKHEIGHT);
+  ctx.fillStyle = "rgba(" + color.r + ", " + color.g + ", " + color.b + ", " + color.alpha + ")";
+  ctx.fill();
+  ctx.closePath();
+  //Inner outline
+	ctx.strokeStyle = "rgba(0, 0, 0, " + color.alpha + ")"; //The stroke uses the block alpha so that it will fade along with the regular block color
+  ctx.strokeRect(xblocks * BLOCKWIDTH, yblocks * BLOCKHEIGHT, BLOCKWIDTH, BLOCKHEIGHT);
+}
+
 function drawAbsBlock(block) {
   //Block itself
   ctx.beginPath();
@@ -567,10 +584,10 @@ function drawTPiece(tpiece) {
 }
 
 function drawBackground() {
-  for (var i = 0; i < GAMEWIDTHBLOCKS; i++) {
-    for (var j = 0; j < GAMEHEIGHTBLOCKS; j++) {
-      if (blockMap.get(i).get(j) != 0) {
-        drawAbsBlock(blockMap.get(i).get(j));
+  for (var x = 0; x < GAMEWIDTHBLOCKS; x++) {
+    for (var y = 0; y < GAMEHEIGHTBLOCKS; y++) {
+      if (blockMap.get(x).get(y) != 0) {
+				drawBGBlock(x, y, blockMap.get(x).get(y));
       }
     }
   }
@@ -585,6 +602,8 @@ function draw() {
   drawTPiece(currentTPiece);
 
   //drawPause(); //TODO
+
+	//drawScore(); //TODO
 
   //drawing the dropped pieces
   drawBackground();

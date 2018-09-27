@@ -19,9 +19,16 @@ const MINE_G = 100;
 const MINE_B = 100;
 const MINE_SIZE_PERCENT = 0.8;
 
+const TILE_NON_CLICKED_COLOR = "grey";
+const TILE_CLICKED_COLOR = "aquamarine";
+const TILE_FONT_SIZE = GRID_ITEM_WIDTH - 16;
+const TILE_FONT = `${TILE_FONT_SIZE}px serif`;
+const TILE_FONT_COLOR = "salmon";
+
 /// GAME VARS
 var mines = {};
 var tiles = {};
+var request_animation_frame_id = null;
 
 
 /*
@@ -65,15 +72,23 @@ class Tile {
     }
 }
 
+let game_running = true;
+
 //Event handling
 const clickHandler = evt => {
+    if(!game_running) {
+        return;
+    }
+
     const real_x_px = evt.pageX - canvas.offsetLeft;
     const real_y_px = evt.pageY - canvas.offsetTop;
     const x = Math.floor(real_x_px/GRID_ITEM_WIDTH);
     const y = Math.floor(real_y_px/GRID_ITEM_HEIGHT);
 
     if(testMine(x, y)) {
-        alert('you lose!');
+        drawMines(false);
+        stopGame();
+        alert('You lose!');
     } else {
         toggleTile(x, y);
     }
@@ -82,7 +97,7 @@ const clickHandler = evt => {
 canvas.addEventListener("click", clickHandler, false);
 
 const testMine = (x, y) => {
-    return !!mines[x][y];
+    return mines[x] && mines[x][y];
 }
 
 const toggleTile = (x, y) => {
@@ -91,6 +106,11 @@ const toggleTile = (x, y) => {
         clicked_tile.click();
     // }
     // tiles.set({x, y}, clicked_tile);
+}
+
+const stopGame = () => {
+    game_running = false;
+    cancelAnimationFrame(request_animation_frame_id);
 }
 
 
@@ -120,13 +140,22 @@ const drawMine = mine => {
     ctx.closePath();
 }
 
-const drawMines = () => {
+const drawMineAsTile = mine => {
+    ctx.beginPath();
+    ctx.rect(mine.x * GRID_ITEM_WIDTH, mine.y * GRID_ITEM_HEIGHT, GRID_ITEM_WIDTH, GRID_ITEM_HEIGHT);
+    ctx.fillStyle = TILE_NON_CLICKED_COLOR;
+    ctx.fill();
+    ctx.closePath();
+}
+
+const drawMines = (asTile) => {
     for(let mine_line of Object.values(mines)) {
         for(let mine of Object.values(mine_line)) {
-            drawMine(mine);
-            // if(mine.y === 1 && mine.x === 0) {
-            //     console.log('mine: ', mine, pos);
-            // }
+            if(asTile) {
+                drawMineAsTile(mine);
+            } else {
+                drawMine(mine);
+            }
         }
     }
 }
@@ -144,61 +173,31 @@ const drawGrid = () => {
 }
 
 const drawTile = tile => {
-    //Drawing text
-    ctx.font = '30px serif';
-    ctx.fillStyle = "black";
-    ctx.fillText(tile.number, tile.x * GRID_ITEM_WIDTH, tile.y * GRID_ITEM_HEIGHT);
-
     ctx.beginPath();
     ctx.rect(tile.x * GRID_ITEM_WIDTH, tile.y * GRID_ITEM_HEIGHT, GRID_ITEM_WIDTH, GRID_ITEM_HEIGHT);
     if(tile.clicked) {
-        ctx.fillStyle = "blue";
+        ctx.fillStyle = TILE_CLICKED_COLOR;
     } else {
-        ctx.fillStyle = "grey";
+        ctx.fillStyle = TILE_NON_CLICKED_COLOR;
     }
     ctx.fill();
     ctx.closePath();
+
+    if(tile.clicked) {
+        //Drawing text
+        ctx.font = TILE_FONT;
+        ctx.textAlign = "center";
+        ctx.fillStyle = TILE_FONT_COLOR;
+        ctx.fillText(tile.number, (tile.x + 1) * GRID_ITEM_WIDTH - GRID_ITEM_WIDTH/2, (tile.y + 1) * GRID_ITEM_HEIGHT - GRID_ITEM_HEIGHT/4);
+    }
 }
 
 const drawTiles = () => {
     for(let tile_line of Object.values(tiles)) {
         for(let tile of Object.values(tile_line)) {
             drawTile(tile);
-            // if(tile.y === 1 && tile.x === 0) {
-            //     console.log('tile: ', tile, pos);
-            // }
         }
     }
-}
-
-function drawAbsBlock(block) {
-  //Block itself
-  ctx.beginPath();
-  ctx.rect(block.absX, block.absY, BLOCKWIDTH, BLOCKHEIGHT);
-  ctx.fillStyle = "rgba(" + block.color.r + ", " + block.color.g + ", " + block.color.b + ", " + block.color.alpha + ")";
-  ctx.fill();
-  ctx.closePath();
-  //Inner outline
-	ctx.strokeStyle = "rgba(0, 0, 0, " + block.color.alpha + ")"; //The stroke uses the block alpha so that it will fade along with the regular block color
-  ctx.strokeRect(block.absX, block.absY, BLOCKWIDTH, BLOCKHEIGHT);
-}
-
-function drawTPiece(tpiece) {
-  var blocks = TPiecetoabsBlocks(tpiece);
-
-  for (var i = 0; i < blocks.length; i++) {
-    drawAbsBlock(blocks[i]);
-  }
-}
-
-function drawBackground() {
-  for (var x = 0; x < GAMEWIDTHBLOCKS; x++) {
-    for (var y = 0; y < GAMEHEIGHTBLOCKS; y++) {
-      if (blockMap.get(x).get(y) != 0) {
-        drawBGBlock(x, y, blockMap.get(x).get(y));
-      }
-    }
-  }
 }
 
 //draw stuff here
@@ -207,7 +206,7 @@ const draw = () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     drawTiles();
-    drawMines();
+    drawMines(true);
     // drawBoop({x: 0, y: 0});
     drawGrid();
 
@@ -216,7 +215,7 @@ const draw = () => {
     //drawScore(); //TODO
 
     //Makes it so that the draw function is called whenever necessary - makes it so that there is no need to rely on a setInterval function
-    requestAnimationFrame(draw);
+    request_animation_frame_id = requestAnimationFrame(draw);
 }
 
 /*
@@ -250,27 +249,45 @@ const populateGrid = () => {
         }
     }
 
-    console.log('tiles ', tiles);
-    console.log('mines ', mines);
+    // console.log('tiles ', tiles);
+    // console.log('mines ', mines);
 }
 
 const calculateTileNumbers = () => {
     for(let tile_line of Object.values(tiles)) {
         for(let tile of Object.values(tile_line)) {
-            //TODO
+            calculateTileNumbers_helper(tile);
         }
     }
 }
 
+const calculateTileNumbers_helper = tile => {
+    let n = 0;
+
+    for(let i = tile.x-1; i <= tile.x+1; ++i) {
+        for(let j = tile.y-1; j <= tile.y+1; ++j) {
+            if(i === tile.x && j === tile.y) {
+                continue;
+            }
+            if(mines[i] && mines[i][j]) {
+                n++;
+            }
+        }
+    }
+
+    tile.setNumber(n);
+}
+
 const init = () => {
-  //Setting the page title
-  document.title = 'BombSweeper!';
+    //Setting the page title
+    document.title = 'BombSweeper!';
 
-  populateGrid();
-  calculateTileNumbers();
+    populateGrid();
+    calculateTileNumbers();
 
-  //Starting the drawing of the game - requestAnimationFrame is used inside draw so it doesn't need to be called repeatedly
-  draw();
+    //Starting the drawing of the game
+    //requestAnimationFrame is also used inside draw so it doesn't need to be called repeatedly using setInterval or whatnot
+    request_animation_frame_id = requestAnimationFrame(draw);
 }
 
 //Calling init so that the game actually starts

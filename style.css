@@ -1,0 +1,27 @@
+body {
+    margin: 2em 2em;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+ul {
+    list-style: none;
+}
+
+ul li a {
+    color: black;
+}
+
+ul li::before {
+    content: ">";
+    margin-right: 1em;
+    transition: margin-right 0.2s ease-in-out;
+}
+
+ul li {
+    margin-bottom: 2em;
+    margin-top: 1em;
+}
+
+ul li:hover::before {
+    margin-right: 2em;
+}

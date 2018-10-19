@@ -1,42 +1,17 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <title>Gamedev'ing</title>
-    <style>
-    	* { padding: 0; margin: 0; }
-    	canvas { background: #eee; display: block; margin: 0 auto; }
-      .flexContainer {display: flex; width: 100vw; height: 100vh; background-color: blue; flex-direction: column; align-items: center; justify-content: center;}
-    </style>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Small Browser Games built using JS's Canvas</title>
 </head>
 <body>
-<div class="flexContainer">
-    <canvas id="myCanvas" width="480" height="320"></canvas>
-</div>
-<script language="javascript" type="text/javascript" src="minesweeper.js">
-</script>
-
-<!--
-<button type="button" value="Submit" onclick="pongBtnClick()" id='pongButton'>Click me for Pong!
-<div id="mylink"></div>
-</button>
-
-<script type="text/javascript">
-
-function pongBtnClick(){
-
-	var pongButton = document.getElementById('pongButton');
-
-    var script = document.createElement("script");
-    script.type = "text/javascript";
-    script.src = "pong.js";
-    document.getElementsByTagName("head")[0].appendChild(script);
-    return false;
-
-}
-</script>
--->
-
-
+    <h1>Check out the games I've built:</h1>
+    <ul>
+        <li><a href="brickbreak">Brickbreak</a></li>
+        <li><a href="minesweeper">Minesweeper (You can lose on the first play and only one square is cleared at a time, good luck!)</a></li>
+        <li><a href="pong">Why ping when you can Pong!</a></li>
+        <li><a href="tetris">Tetris Clone! (Line clearing isn't perfect, sadly)</a></li>
+    </ul>
 </body>
 </html>
